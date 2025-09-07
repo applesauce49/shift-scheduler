@@ -72,10 +72,10 @@ export default function RequestsList() {
         <div className="pb-6 border border-gray-200 rounded-lg">
           <div className="flex items-center justify-between px-6 py-3 border-b border-gray-200">
             <p className="text-lg font-semibold leading-tight text-gray-800 lg:text-xl">
-              ניהול בקשות
+              Requests Management
             </p>
             {/* <div className="flex cursor-pointer items-center justify-center px-3 ml-1 py-2.5 border rounded border-gray-100">
-              <p className="text-xs leading-none text-gray-600 md:text-sm">סנן לפי: חדש</p>
+              <p className="text-xs leading-none text-gray-600 md:text-sm">Filter by: New</p>
             </div> */}
           </div>
           <div className="px-4 pt-4">
@@ -100,7 +100,7 @@ export default function RequestsList() {
             {showAllRequests ? (
               <div className="flex justify-center mt-5">
                 <Button className="text-lg bg-gray-600" onClick={() => setOpen((o) => !o)}>
-                  ראה הכל
+                  View all
                 </Button>
               </div>
             ) : null}
@@ -117,7 +117,7 @@ export default function RequestsList() {
             </Collapse>
             {!showAllRequests ? (
               <h1 className="text-2xl font-medium text-center my-28 text-slate-800">
-                אין בקשות לחסימת תאריכים
+                No block date requests
               </h1>
             ) : null}
           </div>

@@ -1,13 +1,13 @@
 import { format } from 'date-fns';
-import he from 'date-fns/locale/he';
+// import he from 'date-fns/locale/he';
 
 export default function MobileView({ table, getDayHebrew, datesArr }) {
   const formatDay = (date) => {
-    return format(date, 'd LLLL', { locale: he });
+    return format(date, 'd LLLL');
   };
 
   return (
-    <div className="table w-full md:hidden after:mt-10" dir="rtl">
+    <div className="table w-full md:hidden after:mt-10">
       {table ? (
         datesArr.map((e, i) => {
           return (
@@ -26,14 +26,14 @@ export default function MobileView({ table, getDayHebrew, datesArr }) {
                     return (
                       <div className="mobileview__employee" key={employee._id}>
                         <p key={employee._id}>{employee.username}</p>
-                        <p className="mt-auto mr-1 text-sm">ערב</p>
+                        <p className="mt-auto mr-1 text-sm">Evening</p>
                       </div>
                     );
                   } else if (table[i].length - 4 <= employeeIndex && table[i].length > 2) {
                     return (
                       <div className="mobileview__employee" key={employee._id}>
                         <p key={employee._id}>{employee.username}</p>
-                        <p className="mt-auto mr-1 text-sm">אמצע</p>
+                        <p className="mt-auto mr-1 text-sm">Middle</p>
                       </div>
                     );
                   } else {
@@ -44,12 +44,12 @@ export default function MobileView({ table, getDayHebrew, datesArr }) {
                     );
                   }
                 })}
-              {/* <span className="text-xs font-semibold"> (אמצע)</span> */}
+              {/* <span className="text-xs font-semibold"> (Middle)</span> */}
             </div>
           );
         })
       ) : (
-        <h1 className="text-2xl font-medium text-center my-28 text-slate-800">לא פורסם סידור</h1>
+        <h1 className="text-2xl font-medium text-center my-28 text-slate-800">No schedule published</h1>
       )}
     </div>
   );

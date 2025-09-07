@@ -30,9 +30,9 @@ const MyRequests = () => {
     <>
       <Navbar />
       <div>
-        <div className="grid mt-5 place-items-center" dir="rtl">
+        <div className="grid mt-5 place-items-center">
           <div className="w-11/12 md:w-5/6 lg:w-5/6">
-            <h1 className="text-3xl font-semibold">בקשות ואילוצים</h1>
+            <h1 className="text-3xl font-semibold">Requests & Constraints</h1>
             <RequestList />
           </div>
         </div>

@@ -7,10 +7,10 @@ const Table = () => {
             <tr>
               <th></th>
               <th scope="col" className="px-6 py-3 text-left tracking-wider">
-                תאריך
+                Date
               </th>
               <th scope="col" className="px-6 py-3 text-left tracking-wider">
-                סוג
+                Type
               </th>
             </tr>
           </thead>

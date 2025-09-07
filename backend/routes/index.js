@@ -6,7 +6,8 @@ const Shift = require('./../models/Shift');
 const genPassword = require('./../passport/passwordFunctions').genPassword;
 const isAdmin = require('./middleware/isAdmin');
 const _ = require('lodash');
-const { nextSunday, getISOWeek, format } = require('date-fns');
+const { nextMonday, getISOWeek, format } = require('date-fns');
+const { listEvents, toSchedule } = require('../services/googleCalendar');
 
 // USER API
 router.get('/api/user', (req, res) => {
@@ -31,17 +32,17 @@ router.get('/api/users', isAdmin, async (req, res) => {
 // REGISTER (admin only), LOGIN & LOGOUT
 router.post('/register', isAdmin, async (req, res, next) => {
   try {
-    User.findOne({ username: req.body.username }, function (err, user) {
+    const { username, password, email } = req.body;
+    User.findOne({ $or: [{ username }, { email }] }, function (err, existing) {
       if (err) res.json(err.msg);
-      if (user) res.json('UserAlreadyExists');
-      if (!user && req.body.username !== '') {
-        const saltHash = genPassword(req.body.password);
+      if (existing) {
+        if (existing.username === username) return res.json('UserAlreadyExists');
+        if (email && existing.email === email) return res.json('EmailAlreadyExists');
+      }
+      if (!existing && username !== '') {
+        const saltHash = genPassword(password);
         const { salt, hash } = saltHash;
-        const newUser = new User({
-          username: req.body.username,
-          hash: hash,
-          salt: salt,
-        });
+        const newUser = new User({ username, email, hash, salt });
 
         newUser.save().then((user) => {
           res.json('Registered');
@@ -142,13 +143,13 @@ router.post('/postSchedule', isAdmin, async (req, res) => {
     // save schedule to database
     const { savedSchedule, savedBy } = req.body;
     const currentDate = new Date();
-    const upcomingSunday = nextSunday(currentDate);
-    const name = `(WN ${getISOWeek(upcomingSunday)}) ${format(upcomingSunday, `dd-MM-yyyy`)}`;
+    const upcomingMonday = nextMonday(currentDate);
+    const name = `(WN ${getISOWeek(upcomingMonday)}) ${format(upcomingMonday, `dd-MM-yyyy`)}`;
     const newShift = await new Shift({
       name,
       data: savedSchedule,
       savedBy,
-      date: currentDate,
+      date: upcomingMonday,
     });
     newShift.save();
 
@@ -156,6 +157,51 @@ router.post('/postSchedule', isAdmin, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.send(error.msg);
+  }
+});
+
+// ADMIN IMPORT SCHEDULE FROM GOOGLE CALENDAR
+router.post('/import-schedule', isAdmin, async (req, res) => {
+  try {
+    const base = req.body?.date ? new Date(req.body.date) : new Date();
+    const tz = process.env.GOOGLE_TIMEZONE || 'UTC';
+    const calendarId = process.env.GOOGLE_CALENDAR_ID;
+    if (!calendarId) return res.status(400).send('GOOGLE_CALENDAR_ID not set');
+
+    // Compute [Sunday 00:00 .. Saturday 23:59] window in UTC
+    const monday = nextMonday(base);
+    const start = new Date(Date.UTC(monday.getUTCFullYear(), monday.getUTCMonth(), monday.getUTCDate(), 0, 0, 0, 0));
+    const end = new Date(start); // Sunday end of day
+    end.setUTCDate(end.getUTCDate() + 6);
+    end.setUTCHours(23, 59, 59, 999);
+
+    const events = await listEvents({
+      calendarId,
+      timeMin: start.toISOString(),
+      timeMax: end.toISOString(),
+      timeZone: tz,
+    });
+
+    // Build user email -> user map for attendee resolution
+    const allUsers = await User.find({}, { username: 1, email: 1 });
+    const usersByEmail = allUsers.reduce((acc, u) => {
+      if (u.email) acc[u.email.toLowerCase()] = { username: u.username };
+      return acc;
+    }, {});
+    const schedule = toSchedule({ events, usersByEmail, timeZone: tz });
+
+    if (req.query.dryRun === 'true') {
+      return res.json({ schedule });
+    }
+
+    const name = `(WN ${getISOWeek(monday)}) ${format(monday, `dd-MM-yyyy`)}`;
+    const savedBy = req.user?.username || 'system';
+    const newShift = await new Shift({ name, data: schedule, savedBy, date: monday });
+    await newShift.save();
+    res.send('Success');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error');
   }
 });
 
@@ -222,7 +268,7 @@ router.post('/toggle-request-status', isAdmin, async (req, res) => {
 // ADMIN MANAGE USERS
 router.post('/update-user', isAdmin, async (req, res) => {
   try {
-    const { _id: id, username, password } = req.body.modalData;
+    const { _id: id, username, password, email } = req.body.modalData;
 
     // console.log(req.body.modalData);
 
@@ -232,11 +278,14 @@ router.post('/update-user', isAdmin, async (req, res) => {
     }
 
     const foundUser = await User.findOne({ username });
+    const foundEmail = email ? await User.findOne({ email }) : null;
 
     switch (true) {
       case foundUser === null:
         console.log('User not found, nothing to update');
-        await User.findOneAndUpdate({ _id: id }, { username });
+        // check email uniqueness if provided
+        if (foundEmail && foundEmail.id !== id) return res.send('EmailTaken');
+        await User.findOneAndUpdate({ _id: id }, { username, email });
         res.send('Success');
         break;
       case foundUser.username === username && foundUser.id !== id:
@@ -245,6 +294,12 @@ router.post('/update-user', isAdmin, async (req, res) => {
         break;
       case foundUser.username === username:
         console.log('nothing happened, same user');
+        // allow updating email even if username unchanged
+        if (email) {
+          if (foundEmail && foundEmail.id !== id) return res.send('EmailTaken');
+          await User.findOneAndUpdate({ _id: id }, { email });
+          return res.send('Success');
+        }
         res.send('NoChangesMade');
         break;
       default:

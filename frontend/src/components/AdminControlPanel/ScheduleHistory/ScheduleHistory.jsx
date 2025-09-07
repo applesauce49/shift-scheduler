@@ -50,20 +50,19 @@ const ScheduleHistory = () => {
     e.preventDefault();
 
     Swal.fire({
-      title: '?האם להמשיך',
-      text: 'לא ניתן לשחזר משמרת שנמחקה',
+      title: 'Proceed?',
+      text: 'Deleted schedules cannot be restored',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      cancelButtonText: 'ביטול',
-      confirmButtonText: 'כן, מחק משמרת',
+      cancelButtonText: 'Cancel',
+      confirmButtonText: 'Yes, delete schedule',
     }).then((result) => {
       if (result.isConfirmed) {
         axios.post('/removeSchedule', { id });
         refreshShifts();
-        // Swal.fire('!משמרת נמחקה', 'המשמרת נמחקה בהצלחה, רענן את העמוד לראות שינויים', 'success');
-        Swal.fire('!משמרת נמחקה', 'המשמרת נמחקה בהצלחה', 'success');
+        Swal.fire('Schedule deleted!', 'The schedule was deleted successfully', 'success');
       }
     });
   };
@@ -72,32 +71,32 @@ const ScheduleHistory = () => {
     <>
       <Navbar />
       <div>
-        <div className="grid mt-5 place-items-center" dir="rtl">
+        <div className="grid mt-5 place-items-center">
           <div className="w-11/12 lg:w-4/6">
-            <h1 className="text-3xl font-semibold">סידורי עבודה</h1>
+            <h1 className="text-3xl font-semibold">Schedules</h1>
             {shifts.length > 0 && (
               <table className="w-full mx-auto my-10 border-separate shadow-sm table-auto md:w-5/6 lg:w-4/6">
                 <thead>
-                  <tr className="text-xl text-right">
+                  <tr className="text-xl text-left">
                     <th className="w-1/12">
                       <RiHashtag />
                     </th>
                     <th className="w-4/12">
                       <div className="flex">
                         <FcCalendar className="mx-1 mt-1" />
-                        <p className="">תאריך סידור</p>
+                        <p className="">Schedule Date</p>
                       </div>
                     </th>
                     <th className="w-4/12">
                       <div className="flex">
                         <FcAlarmClock className="mx-1 mt-1" />
-                        זמן פרסום
+                        Published At
                       </div>
                     </th>
                     <th className="w-2/12">
                       <div className="flex">
                         <FcManager className="mx-1 mt-1" />
-                        על-ידי
+                        By
                       </div>
                     </th>
                     <th className="w-1/12"></th>
@@ -143,8 +142,8 @@ const ScheduleHistory = () => {
             {shifts.length === 0 && (
               <>
                 <div className="text-2xl font-medium text-center my-28">
-                  <h1>לא נמצאו משמרות</h1>
-                  <h1>יש ליצור סידור עבודה חדש</h1>
+                  <h1>No schedules found</h1>
+                  <h1>Create a new schedule</h1>
                 </div>
               </>
             )}

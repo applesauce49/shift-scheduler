@@ -25,7 +25,7 @@ export default function RequestsList() {
         <div className="pb-6 border border-gray-200 rounded-lg">
           <div className="flex items-center justify-between px-6 py-3 border-b border-gray-200">
             <p className="text-lg font-semibold leading-tight text-gray-800 lg:text-xl">
-              הבקשות שלי
+              My Requests
             </p>
           </div>
           <div className="px-4 pt-4">
@@ -53,12 +53,12 @@ export default function RequestsList() {
             {blockedDates.length > 0 ? (
               <div className="flex justify-center mt-5">
                 <Button className="text-lg bg-gray-600" onClick={() => setOpen((o) => !o)}>
-                  ראה הכל
+                  View all
                 </Button>
               </div>
             ) : (
               <h1 className="text-2xl font-medium text-center my-28 text-slate-800">
-                אין בקשות לחסימת תאריכים
+                No block date requests
               </h1>
             )}
             <Collapse in={opened}>

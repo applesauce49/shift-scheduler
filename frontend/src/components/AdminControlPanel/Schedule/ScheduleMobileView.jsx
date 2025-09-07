@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function ScheduleMobileView({ table, getDayHebrew, formatDay, datesArr }) {
   return (
-    <div className="table md:hidden w-full mt-10 md:w-9/12 lg:w-8/12 mb-10" dir="rtl">
+    <div className="table md:hidden w-full mt-10 md:w-9/12 lg:w-8/12 mb-10">
       {table ? (
         datesArr.map((e, i) => {
           return (
@@ -27,7 +27,7 @@ export default function ScheduleMobileView({ table, getDayHebrew, formatDay, dat
                   <div key={employee._id} className="font-semibold text-lg">
                     <p key={employee._id}>
                       {employee.username}
-                      <span className="font-semibold text-xs"> (אמצע)</span>
+                      <span className="font-semibold text-xs"> (Middle)</span>
                     </p>
                   </div>
                 );
@@ -37,7 +37,7 @@ export default function ScheduleMobileView({ table, getDayHebrew, formatDay, dat
                   <div key={employee._id} className="font-semibold text-lg">
                     <p key={employee._id}>
                       {employee.username}
-                      <span className="font-semibold text-xs"> (ערב)</span>
+                      <span className="font-semibold text-xs"> (Evening)</span>
                     </p>
                   </div>
                 );
@@ -46,7 +46,7 @@ export default function ScheduleMobileView({ table, getDayHebrew, formatDay, dat
           );
         })
       ) : (
-        <h3 className="text-center text-lg">לחץ "הכן סידור" ע"מ ליצור סידור עבודה חדש.</h3>
+        <h3 className="text-center text-lg">Click "Prepare Schedule" to create a new schedule.</h3>
       )}
     </div>
   );

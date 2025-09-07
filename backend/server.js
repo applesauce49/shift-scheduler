@@ -11,6 +11,7 @@ const cors = require('cors');
 
 const app = express();
 const PORT = 4080;
+const MONGO_URI = process.env.MONGODB_URI || 'mongodb://database:27017/shift-scheduler';
 
 app.use(express.json()); // for parsing application/json
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
@@ -18,9 +19,9 @@ app.use(cors());
 
 const User = require('./models/User');
 
-// mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/shift-scheduler');
-mongoose.connect('mongodb://database:27017/shift-scheduler').catch((err) => {
-  console.log(err.msg);
+// Database connection
+mongoose.connect(MONGO_URI).catch((err) => {
+  console.error(err);
 });
 
 // .connect(process.env.MONGODB_URI || 'mongodb://localhost/shift-scheduler')
@@ -65,8 +66,8 @@ passport.deserializeUser((id, cb) => {
 
 app.use(
   session({
-    secret: 'boterham',
-    store: MongoStore.create({ mongoUrl: 'mongodb://database:27017/shift-scheduler' }),
+    secret: process.env.SESSION_SECRET || 'change-me',
+    store: MongoStore.create({ mongoUrl: MONGO_URI }),
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -79,8 +80,10 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// PRODUCTION BUILD
-app.use(express.static('../frontend/build'));
+// Serve frontend build only in production (Nginx handles static in prod compose)
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static('../frontend/build'));
+}
 
 // ROUTES
 app.use(routes);

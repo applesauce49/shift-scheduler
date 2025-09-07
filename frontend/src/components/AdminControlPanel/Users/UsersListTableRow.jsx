@@ -47,7 +47,7 @@ const RequestListTableRow = ({ user, onClick }) => {
               onClick={openModal}
               className="flex items-center justify-center px-2 py-3 mt-2 bg-gray-300 rounded-full"
             >
-              <p className="text-base leading-3 text-gray-700">עריכה</p>
+              <p className="text-base leading-3 text-gray-700">Edit</p>
             </button>
           </div>
         </td>

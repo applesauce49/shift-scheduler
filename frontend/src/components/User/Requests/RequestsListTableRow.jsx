@@ -17,7 +17,7 @@ const RequestListTableRow = ({ comment, date, status, onClick, dateID }) => {
                 )}
                 {!comment && (
                   <p className="italic font-medium text-gray-800 whitespace-normal">
-                    לא הוזנה הערה
+                    No comment provided
                   </p>
                 )}
               </div>
@@ -33,7 +33,7 @@ const RequestListTableRow = ({ comment, date, status, onClick, dateID }) => {
                 onClick={onClick}
                 className="flex items-center justify-center px-2 py-3 mt-2 bg-green-200 rounded-full"
               >
-                <p className="text-base leading-3 text-green-700">מאושר</p>
+                <p className="text-base leading-3 text-green-700">Approved</p>
               </div>
             )}
             {currentDate <= requestDate && !status && (
@@ -42,7 +42,7 @@ const RequestListTableRow = ({ comment, date, status, onClick, dateID }) => {
                   onClick={onClick}
                   className="flex items-center justify-center px-2 py-3 mt-2 bg-yellow-200 rounded-full"
                 >
-                  <p className="text-base leading-3 text-yellow-700">בהמתנה</p>
+                  <p className="text-base leading-3 text-yellow-700">Pending</p>
                 </div>
               </>
             )}
@@ -52,7 +52,7 @@ const RequestListTableRow = ({ comment, date, status, onClick, dateID }) => {
                   onClick={onClick}
                   className="flex items-center justify-center px-2 py-3 mt-2 bg-red-200 rounded-full"
                 >
-                  <p className="text-base leading-3 text-red-700">לא אושר</p>
+                  <p className="text-base leading-3 text-red-700">Not approved</p>
                 </div>
               </>
             )}

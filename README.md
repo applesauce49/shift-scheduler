@@ -70,6 +70,21 @@ Insert this first user document under the `users` collection:
 
 After running `docker compose up`, Docker should create a permanent volume on the host where all the data will be saved.
 
+## Environment Variables
+
+Backend reads configuration from environment variables. For local development without Docker, copy `backend/.env.example` to `backend/.env` and fill the values. Docker Compose is configured to load `backend/.env` and also accepts environment overrides.
+
+Required/optional variables:
+
+- `MONGODB_URI`: Mongo connection string (e.g., `mongodb://database:27017/shift-scheduler` in Docker; `mongodb://localhost:27017/shift-scheduler` locally).
+- `SESSION_SECRET`: Secret used to sign session cookies.
+- `GOOGLE_CALENDAR_ID`: Google Calendar ID (calendar email, or `primary`).
+- `GOOGLE_CLIENT_EMAIL`: Service account client email.
+- `GOOGLE_PRIVATE_KEY`: Service account private key. If placing in `.env`, keep `\n` line breaks escaped or wrap in quotes as shown in `backend/.env.example`.
+- `GOOGLE_TIMEZONE`: IANA timezone (e.g., `UTC`, `America/New_York`, `Asia/Jerusalem`).
+
+In Docker Compose, backend service already includes an `env_file: backend/.env` entry and placeholder variables in `environment:`. Values from `.env` are loaded automatically; any values set directly in `environment:` take precedence.
+
 ## To-do list
 
 To-dos can be found [here](https://projects.ofekasido.xyz/shift-scheduler)

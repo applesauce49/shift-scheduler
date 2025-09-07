@@ -34,9 +34,9 @@ const UsersPage = () => {
     <>
       <Navbar />
       <div>
-        <div className="grid mt-5 place-items-center" dir="rtl">
+        <div className="grid mt-5 place-items-center">
           <div className="w-11/12 lg:w-4/6">
-            <h1 className="text-3xl font-semibold">ניהול משתמשים</h1>
+            <h1 className="text-3xl font-semibold">User Management</h1>
             <UsersContextProvider>
               <UsersList />
             </UsersContextProvider>

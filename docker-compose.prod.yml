@@ -14,19 +14,31 @@ services:
     container_name: scheduler-backend
     build: ./backend
     restart: always
+    env_file:
+      - backend/.env
     ports:
       - 4080:4080
     depends_on:
       - database
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://database:27017/shift-scheduler
+      - SESSION_SECRET=change-me
+      - GOOGLE_CALENDAR_ID
+      - GOOGLE_CLIENT_EMAIL
+      - GOOGLE_PRIVATE_KEY
+      - GOOGLE_TIMEZONE=UTC
 
   frontend:
     container_name: scheduler-frontend
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
     restart: always
     ports:
       - 3000:80
     depends_on:
-      - database
+      - backend
 
 volumes:
   scheduler-db: {}

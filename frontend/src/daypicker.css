@@ -1,0 +1,6 @@
+.rdp {
+  --rdp-cell-size: 40px;            /* default ~36px */
+  --rdp-caption-font-size: 1.05rem; /* caption size */
+  --rdp-months-gap: 0.75rem;        /* gap below header */
+}
+

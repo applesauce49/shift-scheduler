@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 @import url(background.css);
+@import url(daypicker.css);
 
 html,
 body,

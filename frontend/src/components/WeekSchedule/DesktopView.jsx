@@ -6,7 +6,7 @@ export default function DesktopView({ table, datesArr }) {
       <div className="table-row text-xl font-semibold">
         {datesArr &&
           datesArr.map((e, i) => {
-            // TODO: add אמצע OR ערב
+            // TODO: add Middle OR Evening indicator
             return (
               <Fragment key={i}>
                 <div className="table-cell" key={i}>
@@ -16,14 +16,14 @@ export default function DesktopView({ table, datesArr }) {
                         return (
                           <div className="desktopview__employee" key={employee._id}>
                             <p key={employee._id}>{employee.username}</p>
-                            <p className="mt-auto mr-1 text-sm">ערב</p>
+                            <p className="mt-auto mr-1 text-sm">Evening</p>
                           </div>
                         );
                       } else if (table[i].length - 4 <= employeeIndex && table[i].length > 2) {
                         return (
                           <div className="desktopview__employee" key={employee._id}>
                             <p key={employee._id}>{employee.username}</p>
-                            <p className="mt-auto mr-1 text-sm">אמצע</p>
+                            <p className="mt-auto mr-1 text-sm">Middle</p>
                           </div>
                         );
                       } else {
