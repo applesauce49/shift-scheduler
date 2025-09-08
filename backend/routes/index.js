@@ -12,8 +12,8 @@ const { listEvents, toSchedule } = require('../services/googleCalendar');
 // USER API
 router.get('/api/user', (req, res) => {
   if (req.isAuthenticated()) {
-    const { id, username, admin, blockedDates } = req.user;
-    res.json({ id, username, admin, blockedDates, isAuthenticated: true });
+    const { id, username, admin, gender, maritalstatus, blockedDates } = req.user;
+    res.json({ id, username, admin, gender, maritalstatus, blockedDates, isAuthenticated: true });
   } else {
     res.json({ isAuthenticated: false });
   }
@@ -32,7 +32,7 @@ router.get('/api/users', isAdmin, async (req, res) => {
 // REGISTER (admin only), LOGIN & LOGOUT
 router.post('/register', isAdmin, async (req, res, next) => {
   try {
-    const { username, password, email } = req.body;
+    const { username, password, email, gender, maritalstatus } = req.body;
     User.findOne({ $or: [{ username }, { email }] }, function (err, existing) {
       if (err) res.json(err.msg);
       if (existing) {
@@ -42,7 +42,7 @@ router.post('/register', isAdmin, async (req, res, next) => {
       if (!existing && username !== '') {
         const saltHash = genPassword(password);
         const { salt, hash } = saltHash;
-        const newUser = new User({ username, email, hash, salt });
+        const newUser = new User({ username, email, hash, salt, gender, maritalstatus, memberSince: new Date().toLocaleDateString() });
 
         newUser.save().then((user) => {
           res.json('Registered');
@@ -268,51 +268,42 @@ router.post('/toggle-request-status', isAdmin, async (req, res) => {
 // ADMIN MANAGE USERS
 router.post('/update-user', isAdmin, async (req, res) => {
   try {
-    const { _id: id, username, password, email } = req.body.modalData;
-
-    // console.log(req.body.modalData);
+    const { _id: id, username, password, email, gender, maritalstatus } = req.body.modalData;
 
     if (!username) {
-      res.send('UsernameIsEmpty');
-      return;
+      return res.send('UsernameIsEmpty');
     }
 
-    const foundUser = await User.findOne({ username });
-    const foundEmail = email ? await User.findOne({ email }) : null;
+    // Uniqueness checks for username and email
+    const existingByUsername = await User.findOne({ username });
+    if (existingByUsername && existingByUsername.id !== id) {
+      return res.send('UsernameTaken');
+    }
 
-    switch (true) {
-      case foundUser === null:
-        console.log('User not found, nothing to update');
-        // check email uniqueness if provided
-        if (foundEmail && foundEmail.id !== id) return res.send('EmailTaken');
-        await User.findOneAndUpdate({ _id: id }, { username, email });
-        res.send('Success');
-        break;
-      case foundUser.username === username && foundUser.id !== id:
-        console.log('username taken');
-        res.send('UsernameTaken');
-        break;
-      case foundUser.username === username:
-        console.log('nothing happened, same user');
-        // allow updating email even if username unchanged
-        if (email) {
-          if (foundEmail && foundEmail.id !== id) return res.send('EmailTaken');
-          await User.findOneAndUpdate({ _id: id }, { email });
-          return res.send('Success');
-        }
-        res.send('NoChangesMade');
-        break;
-      default:
-        // what does default mean?
-        console.log('hit default');
-        break;
+    if (typeof email !== 'undefined' && email !== null && email !== '') {
+      const existingByEmail = await User.findOne({ email });
+      if (existingByEmail && existingByEmail.id !== id) {
+        return res.send('EmailTaken');
+      }
+    }
+
+    // Build allowlisted updates
+    const updates = {};
+    if (typeof username !== 'undefined') updates.username = username;
+    if (typeof email !== 'undefined') updates.email = email;
+    if (typeof gender !== 'undefined') updates.gender = gender;
+    if (typeof maritalstatus !== 'undefined') updates.maritalstatus = maritalstatus;
+
+    if (Object.keys(updates).length > 0) {
+      await User.findOneAndUpdate({ _id: id }, updates);
     }
 
     if (password) {
-      const saltHash = genPassword(password);
-      const { salt, hash } = saltHash;
+      const { salt, hash } = genPassword(password);
       await User.findOneAndUpdate({ _id: id }, { $set: { salt, hash } });
     }
+
+    return res.send('Success');
   } catch (error) {
     console.error(error);
     res.send(error.msg);

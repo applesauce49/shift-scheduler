@@ -7,6 +7,8 @@ const User = new Schema({
   hash: String,
   salt: String,
   memberSince: String,
+  gender: { type: String, enum: ['male', 'female', 'non-binary', 'other'] },
+  maritalstatus: { type: String, enum: ['single', 'married', 'divorced', 'widowed', 'other'] },
   status: String,
   admin: { type: Boolean, default: false },
   blockedDates: [{ date: String, comment: String, approved: Boolean, approvedBy: String }],

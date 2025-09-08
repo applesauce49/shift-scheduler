@@ -12,6 +12,8 @@ export default function CreateUserModal() {
     username: '',
     email: '',
     password: '',
+    gender: '',
+    maritalstatus: '',
   });
   const [isOpen, setIsOpen] = useState(false);
   const [requestStatus, setReqStatus] = useState(null);
@@ -25,7 +27,7 @@ export default function CreateUserModal() {
     setIsOpen(false);
     setReqStatus(null);
     refreshAllUsers();
-    setModalData({ username: '', email: '', password: '' });
+    setModalData({ username: '', email: '', password: '', gender: '', maritalstatus: '' });
   };
 
   const { refreshAllUsers } = useUsersContext();
@@ -43,6 +45,8 @@ export default function CreateUserModal() {
         username: modalData.username,
         email: modalData.email,
         password: modalData.password,
+        gender: modalData.gender,
+        maritalstatus: modalData.maritalstatus,
       });
 
       if (response.data === 'Registered') {
@@ -154,20 +158,53 @@ export default function CreateUserModal() {
                       />
                     </div>
                   </div>
-                  <div className="my-5 modal__section">
-                    <p className="font-medium">Email</p>
-                    <div>
-                      <input
-                        type="email"
-                        className="border-2"
-                        placeholder="user@example.com"
-                        value={modalData?.email}
-                        onChange={(e) => {
-                          setModalData({ ...modalData, email: e.target.value });
-                        }}
-                      />
-                    </div>
+                <div className="my-5 modal__section">
+                  <p className="font-medium">Email</p>
+                  <div>
+                    <input
+                      type="email"
+                      className="border-2"
+                      placeholder="user@example.com"
+                      value={modalData?.email}
+                      onChange={(e) => {
+                        setModalData({ ...modalData, email: e.target.value });
+                      }}
+                    />
                   </div>
+                </div>
+                <div className="my-5 modal__section">
+                  <p className="font-medium">Gender</p>
+                  <div>
+                    <select
+                      className="border-2"
+                      value={modalData?.gender}
+                      onChange={(e) => setModalData({ ...modalData, gender: e.target.value })}
+                    >
+                      <option value="">Select…</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="non-binary">Non-binary</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="my-5 modal__section">
+                  <p className="font-medium">Marital Status</p>
+                  <div>
+                    <select
+                      className="border-2"
+                      value={modalData?.maritalstatus}
+                      onChange={(e) => setModalData({ ...modalData, maritalstatus: e.target.value })}
+                    >
+                      <option value="">Select…</option>
+                      <option value="single">Single</option>
+                      <option value="married">Married</option>
+                      <option value="divorced">Divorced</option>
+                      <option value="widowed">Widowed</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                </div>
                   <div className="my-5 modal__section">
                     <p className="font-medium">Password</p>
                     <div>
